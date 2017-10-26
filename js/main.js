@@ -16,12 +16,11 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 // Webkit/blink browsers need prefix, Safari won't work without window
 // code examples are nice
 
-let buffers = {};
+let sources = {};
 
 // Load the audio files
 patches.forEach(function(patch) {
 	patch.layers.forEach(function(layer) {
-		console.log("hi mom")
 		let request = new XMLHttpRequest();
 
 		request.open('GET', layer.filename, true);
@@ -31,7 +30,6 @@ patches.forEach(function(patch) {
 		request.onload = function() {
 			let audioData = request.response;
 
-			//buffers[layer.filename] = audioData;
 			let source = audioCtx.createBufferSource();
 			audioCtx.decodeAudioData(audioData).then(function(buffer) {
 				source.buffer = buffer;
@@ -41,6 +39,7 @@ patches.forEach(function(patch) {
 				// play the audio woot
 				source.start(0);
 			});
+			sources[layer.filename] = source;
 		};
 
 		request.send();
