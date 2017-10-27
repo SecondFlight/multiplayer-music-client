@@ -1,7 +1,6 @@
 // Define the instruments
-let patches = [
-	{
-		"name": "Piano",
+let patches = {
+	"Piano": {
 		"layers": [
 			{
 				"filename": "audio/pianoC2.ogg",
@@ -83,7 +82,7 @@ let patches = [
 			}
 		]
 	}
-]
+}
 
 // Maps keys on typing keyboard to midi notes
 let keyboardMap = {"0":87,"2":73,"3":75,"5":78,"6":80,"7":82,"9":85,"q":72,"w":74,"e":76,"r":77,"t":79,"y":81,"u":83,"i":84,"o":86,"p":88,"[":89,"=":90,"]":91,"/":76,";":75,".":74,"l":73,",":72,"m":71,"j":70,"n":69,"h":68,"b":67,"g":66,"v":65,"c":64,"d":63,"x":62,"s":61,"z":60}
@@ -95,7 +94,8 @@ let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let buffers = {};
 
 // Load the audio files
-patches.forEach(function(patch) {
+for (let patchName in patches) {
+	let patch = patches[patchName];
 	patch.layers.forEach(function(layer) {
 		let request = new XMLHttpRequest();
 
@@ -113,9 +113,10 @@ patches.forEach(function(patch) {
 
 		request.send();
 	});
-});
+}
 
-let playnote = function(audioFile, coarseDetune) {
+// Takes a file to play and a tuining value and plays the file
+let playSample = function(audioFile, coarseDetune) {
 	let source = audioCtx.createBufferSource();
 	source.buffer = buffers[audioFile];
 	source.connect(audioCtx.destination);
@@ -123,6 +124,27 @@ let playnote = function(audioFile, coarseDetune) {
 	source.start(0);
 }
 
+// Plays a note given an instrument and a midi number
+let playNote = function(instrument, midiNumber) {
+	let patch = patches[instrument];
+	if (patch == undefined) {
+		return;
+	}
+
+	layersToPlay = [];
+
+	for (let i in patch.layers) {
+		let layer = patch.layers[i];
+		if ((midiNumber >= layer.startNote) && (midiNumber <= layer.endNote)) {
+			layersToPlay.push(layer);
+		}
+	}
+
+	for (let i in layersToPlay) {
+		let layer = layersToPlay[i];
+		playSample(layer.filename, midiNumber - layer.centerNote);
+	}
+}
 
 // modified from https://stackoverflow.com/a/10467137/8166701
 function KeyListener(){
@@ -152,7 +174,7 @@ function KeyListener(){
             const keyName = e.key;
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
-				playnote("audio/piano.wav", keyNum);
+				playNote("Piano", keyNum);
 			}
 
             //this.detectCombinations();
