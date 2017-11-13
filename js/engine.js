@@ -1,14 +1,26 @@
 class Engine {
 	constructor() {
-		// add stuff
+		console.log("Engine class created.");
 	}
 
 	noteOn(userID, noteNumber, instrument="Piano", velocity=1.0) {
-
+		console.log("Note on called.");
+		console.log("userID:");
+		console.log(userID);
+		console.log("noteNumber");
+		console.log(noteNumber);
+		console.log("instrument:");
+		console.log(instrument);
+		console.log("velocity:");
+		console.log(velocity);
 	}
 
 	noteOff(userID, noteNumber) {
-
+		console.log("Note off called.");
+		console.log("userID:");
+		console.log(userID);
+		console.log("noteNumber");
+		console.log(noteNumber);
 	}
 }
 
