@@ -1,3 +1,17 @@
+class Engine {
+	constructor() {
+		// add stuff
+	}
+
+	noteOn(userID, noteNumber, instrument="Piano", velocity=1.0) {
+
+	}
+
+	noteOff(userID, noteNumber) {
+
+	}
+}
+
 // Define the instruments
 let patches = {
 	"Piano": {
