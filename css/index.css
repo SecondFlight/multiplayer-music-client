@@ -1,0 +1,54 @@
+body {
+	font-family: 'Open Sans', sans-serif;
+	background-color: #efefef;
+}
+
+.keyboard {
+	position: fixed;
+	width: 90%;
+	height: 30%;
+}
+
+.whiteKeys {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	display: table;
+	table-layout: fixed;
+}
+
+.blackKeys {
+	position: absolute;
+	margin-left: 2.3%;
+	margin-right: 2.3%;
+	width: 95.4%;
+	height: 70%;
+	display: table;
+	table-layout: fixed;
+	border-spacing: 10px 0;
+}
+
+@media (min-width: 730px) {
+	.blackKeys {
+		border-spacing: 20px 0;		
+	}
+}
+
+.whiteKey {
+	background-color: white;
+	border: 1px solid black;
+	display: table-cell;
+}
+
+.blackKey {
+	background-color: black;
+	display: table-cell;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+/*
+	do something for black key 
+*/

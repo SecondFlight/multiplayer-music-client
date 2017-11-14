@@ -132,6 +132,7 @@ class Engine {
 		console.log(instrument);
 		console.log("velocity:");
 		console.log(velocity);
+		playNote(instrument, noteNumber);
 	}
 
 	noteOff(userID, noteNumber) {
