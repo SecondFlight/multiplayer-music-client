@@ -143,6 +143,14 @@ class Engine {
 		console.log(noteNumber);
 	}
 
+	getInstruments() {
+		let instruments = [];
+		for (let patchName in this.patches) {
+			instruments.push(patchName);
+		}
+		return instruments;
+	}
+
 	// Takes a file to play and a tuining value and plays the file
 	playSample(audioFile, coarseDetune) {
 		let source = this.audioCtx.createBufferSource();
