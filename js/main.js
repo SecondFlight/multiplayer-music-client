@@ -49,7 +49,7 @@ function KeyListener(){
 			if (keyNum != undefined) {
 				engine.noteOn("userName", keyNum);
 			}
-			pingServer("userName", keyNum, 'note on', "", 1.0);
+			pingServer("userName", keyNum, 'note on', "Piano", 1.0);
 
             //this.detectCombinations();
         }
@@ -78,6 +78,7 @@ for (var i = 0; i < noteKeys.length; i++)
 	var element = noteKeys[i];
 	element.addEventListener("click", function(event) {
 		engine.noteOn("userID", parseInt(event.target.dataset.notenumber));
+		pingServer("userName", parseInt(event.target.dataset.notenumber), 'note on', "Piano", 1.0);
 	});
 	
 	element.addEventListener("mouseUp", function(event) {
@@ -94,4 +95,10 @@ function pingServer(userID, noteNumber, msgType, instrument, velocity){
 		instrument: instrument,
 		velocity: velocity} );
 }
+
+socket.on('note on', function(msg) {
+	engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
+});
+
+
 
