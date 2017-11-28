@@ -19,19 +19,13 @@ body {
 
 .blackKeys {
 	position: absolute;
-	margin-left: 2.3%;
+	margin-left: 0.7%;
 	margin-right: 2.3%;
-	width: 95.4%;
+	width: 98.5%;
 	height: 70%;
 	display: table;
 	table-layout: fixed;
 	border-spacing: 10px 0;
-}
-
-@media (min-width: 730px) {
-	.blackKeys {
-		border-spacing: 20px 0;		
-	}
 }
 
 .whiteKey {
