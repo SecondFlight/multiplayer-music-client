@@ -4,19 +4,16 @@ let keyboardMap = {"0":87,"2":73,"3":75,"5":78,"6":80,"7":82,"9":85,"q":72,"w":7
 var socket = io("music.atoms.one:3000");
 
 let engine = new Engine();
-/*
-// copy from https://stackoverflow.com/questions/17015019/keylistener-in-javascript
-window.onkeydown = (e) => {
-	const keyName = e.key;
-	const keyNum = keyboardMap[keyName];
-	
-	if (keyNum != undefined) 
-	{
-		engine.playNote("Piano", keyNum);
-		
-	}
-}*/
 
+//https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
+var userName = "Arthur";
+window.onload = function(){
+	var txt;
+	userName = prompt("Please Enter your Username: ", "" );
+	if (userName == null || userName == "") {
+        userName = "Anonymous";
+    }
+};
 
 
 // modified from https://stackoverflow.com/a/10467137/8166701
@@ -37,31 +34,38 @@ function KeyListener(){
         }
     );
     
-    this.onKeyDown = function(e){
-        var keyCode = e.keyCode;
+    this.onKeyDown = function(event){
+        var keyCode = event.keyCode;
         if(this.keysStatus[keyCode]){
             //consoleOutput('Key ['+keyCode+'] Hold <br/>');
         } else {
             this.keysStatus[keyCode] = new Date();
             
-            const keyName = e.key;
+            const keyName = event.key;
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
-				engine.noteOn("userName", keyNum);
+				engine.noteOn(userName, keyNum);
 			}
-			pingServer("userName", keyNum, 'note on', "Piano", 1.0);
+			var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+			keyElementColour.style.backgroundColor = "red";
+			//setTimeout( function() { keyElementColour.removeAttribute("style");}, 500);
+			pingServer(userName, keyNum, 'note on', "Piano", 1.0);
 
             //this.detectCombinations();
         }
     }
     
-    this.onKeyUp = function(e){
-        var keyCode = e.keyCode;
+    this.onKeyUp = function(event){
+        var keyCode = event.keyCode;
         var keyDownDate = this.keysStatus[keyCode];
         var keyUpDate = new Date();
         var keyHoldTime = keyUpDate-keyDownDate;
         this.keysStatus[keyCode] = false;
-
+		
+		const keyName = event.key;
+        const keyNum = keyboardMap[keyName];
+		var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+		keyElementColour.removeAttribute("style");
         // do things maybe
     }
     
@@ -72,17 +76,20 @@ function KeyListener(){
     }*/
 }
 
+
 var noteKeys = document.getElementsByClassName("note");
 for (var i = 0; i < noteKeys.length; i++)
 {
 	var element = noteKeys[i];
 	element.addEventListener("click", function(event) {
-		engine.noteOn("userID", parseInt(event.target.dataset.notenumber));
-		pingServer("userName", parseInt(event.target.dataset.notenumber), 'note on', "Piano", 1.0);
+		engine.noteOn(userName, parseInt(event.target.dataset.notenumber));
+		event.style.backgroundColor = "red";
+		setTimeout( function() { event.target.removeAttribute("style");}, 500);
+		pingServer(userName, parseInt(event.target.dataset.notenumber), 'note on', "Piano", 1.0);
 	});
 	
 	element.addEventListener("mouseUp", function(event) {
-		engine.noteOn("userID", parseInt(event.target.dataset.notenumber));
+		engine.noteOn(userName, parseInt(event.target.dataset.notenumber));
 	});
 }
 
