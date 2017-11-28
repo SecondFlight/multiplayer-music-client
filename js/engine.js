@@ -1,3 +1,7 @@
+// The proper thing to do would be to stop the actual source audio
+// when the envelope stops.
+// *shrug*
+
 class Engine {
 	constructor() {
 		console.log("Engine class created.");
@@ -83,7 +87,14 @@ class Engine {
 						"endNote": 127,
 						"centerNote": 108
 					}
-				]
+				],
+				"envelope": {
+					attackTime: 0,
+					decayTime: 0,
+					sustainLevel: 1,
+					releaseTime: 0.5,
+					curve: "exponential"
+				}
 			}
 		}
 
@@ -92,6 +103,7 @@ class Engine {
 		// code examples are nice
 
 		this.buffers = {};
+		this.ampEnvelopes = {};
 
 		if (this.audioCtx == undefined) {
 			console.log("AAAAAAAAAAAAAAA");
@@ -124,23 +136,18 @@ class Engine {
 
 	noteOn(userID, noteNumber, instrument="Piano", velocity=1.0) {
 		console.log("Note on called.");
-		console.log("userID:");
-		console.log(userID);
-		console.log("noteNumber");
-		console.log(noteNumber);
-		console.log("instrument:");
-		console.log(instrument);
-		console.log("velocity:");
-		console.log(velocity);
-		this.playNote(instrument, noteNumber);
+		console.log("userID:" + userID);
+		console.log("noteNumber" + noteNumber.toString());
+		console.log("instrument:" + instrument);
+		console.log("velocity:" + velocity.toString());
+		this.playNote(userID, instrument, noteNumber);
 	}
 
 	noteOff(userID, noteNumber) {
 		console.log("Note off called.");
-		console.log("userID:");
-		console.log(userID);
-		console.log("noteNumber");
-		console.log(noteNumber);
+		console.log("userID:" + userID);
+		console.log("noteNumber" + noteNumber.toString());
+		this.releaseNote(userID, noteNumber);
 	}
 
 	getInstruments() {
@@ -152,16 +159,40 @@ class Engine {
 	}
 
 	// Takes a file to play and a tuining value and plays the file
-	playSample(audioFile, coarseDetune) {
+	playSample(audioFile, coarseDetune, ampEnvSettings, uniqueID) {
+		if (this.ampEnvelopes[uniqueID] != undefined)
+			return;
+
 		let source = this.audioCtx.createBufferSource();
 		source.buffer = this.buffers[audioFile];
-		source.connect(this.audioCtx.destination);
 		source.detune.value = 100*coarseDetune;
+
+		let gain = this.audioCtx.createGain();
+
+		this.ampEnvelopes[uniqueID] = new Envelope(this.audioCtx, ampEnvSettings);
+		this.ampEnvelopes[uniqueID].connect(gain.gain);
+		gain.gain.value = 0;
+
+		this.ampEnvelopes[uniqueID].start(this.audioCtx.currentTime);
+
+		source.connect(gain);
+		gain.connect(this.audioCtx.destination);
 		source.start(0);
 	}
 
+	releaseSample(uniqueID) {
+		if (this.ampEnvelopes[uniqueID] == undefined)
+			return;
+
+		this.ampEnvelopes[uniqueID].release(this.audioCtx.currentTime);
+		let stopAt = this.ampEnvelopes[uniqueID].getReleaseCompleteTime();
+		this.ampEnvelopes[uniqueID].stop(stopAt);
+
+		this.ampEnvelopes[uniqueID] = undefined;
+	}
+
 	// Plays a note given an instrument and a midi number
-	playNote(instrument, midiNumber) {
+	playNote(userID, instrument, midiNumber) {
 		let patch = this.patches[instrument];
 		if (patch == undefined) {
 			return;
@@ -176,11 +207,19 @@ class Engine {
 			}
 		}
 
+		let uniqueID = userID + midiNumber.toString();
+
+		// I realize that this coding implies that layers can overlap.
+		// As it turns out, layers can most decidedly not overlap.
+
 		for (let i in layersToPlay) {
 			let layer = layersToPlay[i];
-			this.playSample(layer.filename, midiNumber - layer.centerNote);
+			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID);
 		}
 	}
 
-
+	releaseNote(userID, midiNumber) {
+		let uniqueID = userID + midiNumber.toString();
+		this.releaseSample(uniqueID);
+	}
 }

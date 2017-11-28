@@ -64,6 +64,11 @@ function KeyListener(){
 		
 		const keyName = event.key;
         const keyNum = keyboardMap[keyName];
+
+        if (keyNum != undefined) {
+            engine.noteOff(userName, keyNum);
+        }
+
 		var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
 		keyElementColour.removeAttribute("style");
         // do things maybe
