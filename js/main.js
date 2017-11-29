@@ -5,6 +5,10 @@ var socket = io("music.atoms.one:3000");
 
 let engine = new Engine();
 
+let instruments = engine.getInstruments();
+let currentInstrument = instruments[0];
+let midiConnected = false;
+
 //https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
 var userName = "Arthur";
 window.onload = function(){
@@ -45,11 +49,11 @@ function KeyListener(){
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
 				engine.noteOn(userName, keyNum);
+                pingServer(userName, keyNum, 'note on', "Piano", 1.0);
 			}
 			var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
 			keyElementColour.style.backgroundColor = "red";
 			//setTimeout( function() { keyElementColour.removeAttribute("style");}, 500);
-			pingServer(userName, keyNum, 'note on', "Piano", 1.0);
 
             //this.detectCombinations();
         }
@@ -67,6 +71,7 @@ function KeyListener(){
 
         if (keyNum != undefined) {
             engine.noteOff(userName, keyNum);
+            pingServer(userName, keyNum, 'note off');
         }
 
 		var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
@@ -93,14 +98,14 @@ for (var i = 0; i < noteKeys.length; i++)
 		pingServer(userName, parseInt(event.target.dataset.notenumber), 'note on', "Piano", 1.0);
 	});
 	
-	element.addEventListener("mouseUp", function(event) {
+	/*element.addEventListener("mouseUp", function(event) {
 		engine.noteOn(userName, parseInt(event.target.dataset.notenumber));
-	});
+	});*/
 }
 
 var KeyListener = new KeyListener();
 
-function pingServer(userID, noteNumber, msgType, instrument, velocity){
+function pingServer(userID, noteNumber, msgType, instrument = "", velocity = 0){
 	socket.emit(msgType, { 
 		userID: userID,
 		noteNumber: noteNumber,
@@ -112,5 +117,27 @@ socket.on('note on', function(msg) {
 	engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
 });
 
+socket.on('note off', function(msg) {
+    engine.noteOff(msg.userID, msg.noteNumber);
+});
 
-
+document.getElementById("midiButton").addEventListener("click", function(event) {
+    if (!midiConnected && navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess().then(midi => {
+            let inputs = midi.inputs.values();
+            for (let input = inputs.next();
+                 input && !input.done;
+                 input = inputs.next()) {
+                input.value.onmidimessage = message => {
+                    if (message.data[0] == 145) {
+                        engine.noteOn(userName, message.data[1], currentInstrument, message.data[2]/127);
+                    }
+                    else if (message.data[0] == 129) {
+                        engine.noteOff(userName, message.data[1]);
+                    }
+                };
+                midiConnected = true;
+            }
+        });
+    }
+});

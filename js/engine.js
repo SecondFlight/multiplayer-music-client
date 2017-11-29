@@ -173,7 +173,10 @@ class Engine {
 		this.ampEnvelopes[uniqueID].connect(gain.gain);
 		gain.gain.value = 0;
 
+		let sampleTime = source.buffer.length / this.audioCtx.sampleRate;
+
 		this.ampEnvelopes[uniqueID].start(this.audioCtx.currentTime);
+		this.ampEnvelopes[uniqueID].stop(this.audioCtx.currentTime + sampleTime);
 
 		source.connect(gain);
 		gain.connect(this.audioCtx.destination);

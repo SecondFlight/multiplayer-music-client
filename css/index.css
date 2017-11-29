@@ -43,6 +43,10 @@ body {
 	visibility: hidden;
 }
 
+button {
+	margin: 10px;
+}
+
 /*
 	do something for black key 
 */
