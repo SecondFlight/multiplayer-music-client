@@ -95,6 +95,24 @@ class Engine {
 					releaseTime: 0.5,
 					curve: "exponential"
 				}
+			},
+			"Sine Bell": {
+				"layers": [
+					{
+						"filename": "audio/sineC4.ogg",
+						"startNote": 0,
+						"endNote": 127,
+						"centerNote": 72,
+						"loop": true
+					}
+				],
+				"envelope": {
+					attackTime: 0,
+					decayTime: 3,
+					sustainLevel: 0.9,
+					releaseTime: 7,
+					curve: "exponential"
+				}
 			}
 		}
 
@@ -160,7 +178,7 @@ class Engine {
 	}
 
 	// Takes a file to play and a tuining value and plays the file
-	playSample(audioFile, coarseDetune, ampEnvSettings, uniqueID, velocity) {
+	playSample(audioFile, coarseDetune, ampEnvSettings, uniqueID, velocity, doesLoop) {
 		this.releaseSample(uniqueID);
 
 		let currentTime = this.audioCtx.currentTime;
@@ -168,6 +186,7 @@ class Engine {
 		let source = this.audioCtx.createBufferSource();
 		source.buffer = this.buffers[audioFile];
 		source.detune.value = 100*coarseDetune;
+		source.loop = doesLoop;
 
 		let ampEnvGain = this.audioCtx.createGain();
 
@@ -229,7 +248,8 @@ class Engine {
 
 		for (let i in layersToPlay) {
 			let layer = layersToPlay[i];
-			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID, velocity);
+			let doesLoop = (layer.loop != undefined) && (layer.loop);
+			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID, velocity, doesLoop);
 		}
 	}
 

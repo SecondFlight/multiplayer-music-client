@@ -56,8 +56,8 @@ function KeyListener(){
             const keyName = event.key;
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
-				engine.noteOn(userName, keyNum);
-                pingServer(userName, keyNum, 'note on', "Piano", 1.0);
+				engine.noteOn(userName, keyNum, currentInstrument);
+                pingServer(userName, keyNum, 'note on', currentInstrument, 1.0);
 			}
 			var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
 			keyElementColour.style.backgroundColor = "red";
@@ -100,10 +100,10 @@ for (var i = 0; i < noteKeys.length; i++)
 {
 	var element = noteKeys[i];
 	element.addEventListener("click", function(event) {
-		engine.noteOn(userName, parseInt(event.target.dataset.notenumber));
+		engine.noteOn(userName, parseInt(event.target.dataset.notenumber), currentInstrument);
 		event.style.backgroundColor = "red";
 		setTimeout( function() { event.target.removeAttribute("style");}, 500);
-		pingServer(userName, parseInt(event.target.dataset.notenumber), 'note on', "Piano", 1.0);
+		pingServer(userName, parseInt(event.target.dataset.notenumber), 'note on', currentInstrument, 1.0);
 	});
 	
 	/*element.addEventListener("mouseUp", function(event) {
