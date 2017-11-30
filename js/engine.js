@@ -103,6 +103,7 @@ class Engine {
 		// code examples are nice
 
 		this.buffers = {};
+		this.activeBufferSources = {};
 		this.ampEnvelopes = {};
 
 		if (this.audioCtx == undefined) {
@@ -140,7 +141,7 @@ class Engine {
 		console.log("noteNumber" + noteNumber.toString());
 		console.log("instrument:" + instrument);
 		console.log("velocity:" + velocity.toString());
-		this.playNote(userID, instrument, noteNumber);
+		this.playNote(userID, instrument, noteNumber, velocity);
 	}
 
 	noteOff(userID, noteNumber) {
@@ -159,43 +160,54 @@ class Engine {
 	}
 
 	// Takes a file to play and a tuining value and plays the file
-	playSample(audioFile, coarseDetune, ampEnvSettings, uniqueID) {
-		if (this.ampEnvelopes[uniqueID] != undefined)
-			return;
+	playSample(audioFile, coarseDetune, ampEnvSettings, uniqueID, velocity) {
+		this.releaseSample(uniqueID);
+
+		let currentTime = this.audioCtx.currentTime;
 
 		let source = this.audioCtx.createBufferSource();
 		source.buffer = this.buffers[audioFile];
 		source.detune.value = 100*coarseDetune;
 
-		let gain = this.audioCtx.createGain();
+		let ampEnvGain = this.audioCtx.createGain();
 
 		this.ampEnvelopes[uniqueID] = new Envelope(this.audioCtx, ampEnvSettings);
-		this.ampEnvelopes[uniqueID].connect(gain.gain);
-		gain.gain.value = 0;
+		this.ampEnvelopes[uniqueID].connect(ampEnvGain.gain);
+		ampEnvGain.gain.value = 0;
 
 		let sampleTime = source.buffer.length / this.audioCtx.sampleRate;
 
-		this.ampEnvelopes[uniqueID].start(this.audioCtx.currentTime);
-		this.ampEnvelopes[uniqueID].stop(this.audioCtx.currentTime + sampleTime);
+		this.ampEnvelopes[uniqueID].start(currentTime);
+		//this.ampEnvelopes[uniqueID].stop(currentTime + sampleTime);
 
-		source.connect(gain);
-		gain.connect(this.audioCtx.destination);
-		source.start(0);
+		let velocityGain = this.audioCtx.createGain();
+		velocityGain.gain.value = velocity;
+
+		source.connect(ampEnvGain);
+		ampEnvGain.connect(velocityGain);
+		velocityGain.connect(this.audioCtx.destination);
+		source.start(currentTime);
+
+		this.activeBufferSources[uniqueID] = source;
 	}
 
 	releaseSample(uniqueID) {
 		if (this.ampEnvelopes[uniqueID] == undefined)
 			return;
 
-		this.ampEnvelopes[uniqueID].release(this.audioCtx.currentTime);
+		let currentTime = this.audioCtx.currentTime;
+
+		this.ampEnvelopes[uniqueID].release(currentTime);
 		let stopAt = this.ampEnvelopes[uniqueID].getReleaseCompleteTime();
 		this.ampEnvelopes[uniqueID].stop(stopAt);
+		this.activeBufferSources[uniqueID].stop(stopAt);
 
 		this.ampEnvelopes[uniqueID] = undefined;
+		this.activeBufferSources[uniqueID] = undefined;
 	}
 
 	// Plays a note given an instrument and a midi number
-	playNote(userID, instrument, midiNumber) {
+	playNote(userID, instrument, midiNumber, velocity) {
 		let patch = this.patches[instrument];
 		if (patch == undefined) {
 			return;
@@ -217,7 +229,7 @@ class Engine {
 
 		for (let i in layersToPlay) {
 			let layer = layersToPlay[i];
-			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID);
+			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID, velocity);
 		}
 	}
 

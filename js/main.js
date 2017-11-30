@@ -10,13 +10,21 @@ let currentInstrument = instruments[0];
 let midiConnected = false;
 
 //https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
-var userName = "Arthur";
+var userName = "";
 window.onload = function(){
 	var txt;
 	userName = prompt("Please Enter your Username: ", "" );
 	if (userName == null || userName == "") {
         userName = "Anonymous";
     }
+
+    instrumentSelectBox = document.getElementById("instrumentSelect");
+    for (let i = 0; i < instruments.length; i++) {
+        instrumentSelectBox.options[instrumentSelectBox.options.length] = new Option(instruments[i], instruments[i]);
+    }
+    instrumentSelectBox.addEventListener("change", event => {
+        currentInstrument = event.target.value;
+    });
 };
 
 
@@ -131,9 +139,11 @@ document.getElementById("midiButton").addEventListener("click", function(event) 
                 input.value.onmidimessage = message => {
                     if (message.data[0] == 145) {
                         engine.noteOn(userName, message.data[1], currentInstrument, message.data[2]/127);
+                        pingServer(userName, message.data[1], "note on", currentInstrument, message.data[2]/127);
                     }
                     else if (message.data[0] == 129) {
                         engine.noteOff(userName, message.data[1]);
+                        pingServer(userName, message.data[1], "note off");
                     }
                 };
                 midiConnected = true;
