@@ -7,8 +7,9 @@
 	<h3>Use your typing keyboard to play some music or click on the keyboard. :)</h3>
 	<button type="button" id="midiButton">Connect MIDI Device</button>
 	<select id="instrumentSelect">
-		
+
 	</select>
+	<input class="jscolor" id="noteColor">
 	<div class="keyboard">
 		<div class="whiteKeys">
 			<div class="whiteKey note" data-noteNumber = "38"></div>
@@ -100,6 +101,7 @@
 	</div>
 	
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
 	<script src="http://music.atoms.one:3000/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="js/envelope-generator.js"></script>
 	<script type="text/javascript" src="js/engine.js"></script>

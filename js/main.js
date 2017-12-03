@@ -27,6 +27,42 @@ window.onload = function(){
     });
 };
 
+function AddColor(keyNum, color) {
+    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+    element.style.backgroundColor = color;
+}
+
+function RemoveColor(keyNum, previousColor) {
+    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+    if (rgb2hex(element.style.backgroundColor) == "#" + previousColor.toLowerCase()) {
+        element.removeAttribute("style");
+    }
+}
+
+// https://jsfiddle.net/Mottie/xcqpF/1/light/
+function rgb2hex(rgb){
+ rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+ return (rgb && rgb.length === 4) ? "#" +
+  ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+  ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+  ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+}
+
+function GetColorFromPage() {
+    return document.querySelector("#noteColor").value;
+}
+
+function NoteOn(userName, keyNum, currentInstrument, velocity) {
+	engine.noteOn(userName, keyNum, currentInstrument);
+	pingServer(userName, keyNum, 'note on', currentInstrument, velocity);
+	AddColor(keyNum, GetColorFromPage());
+}
+
+function NoteOff(userName, keyNum) {
+	engine.noteOff(userName, keyNum);
+	pingServer(userName, keyNum, 'note off');
+	RemoveColor(keyNum, GetColorFromPage());
+}
 
 // modified from https://stackoverflow.com/a/10467137/8166701
 function KeyListener(){
@@ -56,11 +92,8 @@ function KeyListener(){
             const keyName = event.key;
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
-				engine.noteOn(userName, keyNum, currentInstrument);
-                pingServer(userName, keyNum, 'note on', currentInstrument, 1.0);
+                NoteOn(userName, keyNum, currentInstrument, 1.0);
 			}
-			var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
-			keyElementColour.style.backgroundColor = "red";
 			//setTimeout( function() { keyElementColour.removeAttribute("style");}, 500);
 
             //this.detectCombinations();
@@ -78,12 +111,8 @@ function KeyListener(){
         const keyNum = keyboardMap[keyName];
 
         if (keyNum != undefined) {
-            engine.noteOff(userName, keyNum);
-            pingServer(userName, keyNum, 'note off');
+            NoteOff(userName, keyNum);
         }
-
-		var keyElementColour = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
-		keyElementColour.removeAttribute("style");
         // do things maybe
     }
     
@@ -100,10 +129,9 @@ for (var i = 0; i < noteKeys.length; i++)
 {
 	var element = noteKeys[i];
 	element.addEventListener("click", function(event) {
-		engine.noteOn(userName, parseInt(event.target.dataset.notenumber), currentInstrument);
+		NoteOn(userName, parseInt(event.target.dataset.notenumber), currentInstrument, 1.0);
 		event.style.backgroundColor = "red";
 		setTimeout( function() { event.target.removeAttribute("style");}, 500);
-		pingServer(userName, parseInt(event.target.dataset.notenumber), 'note on', currentInstrument, 1.0);
 	});
 	
 	/*element.addEventListener("mouseUp", function(event) {
@@ -118,32 +146,35 @@ function pingServer(userID, noteNumber, msgType, instrument = "", velocity = 0){
 		userID: userID,
 		noteNumber: noteNumber,
 		instrument: instrument,
-		velocity: velocity} );
+		velocity: velocity,
+        color: GetColorFromPage()} );
 }
 
 socket.on('note on', function(msg) {
 	engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
+    AddColor(msg.noteNumber, msg.color);
 });
 
 socket.on('note off', function(msg) {
     engine.noteOff(msg.userID, msg.noteNumber);
+    RemoveColor(msg.noteNumber, msg.color);
 });
 
 document.getElementById("midiButton").addEventListener("click", function(event) {
-    if (!midiConnected && navigator.requestMIDIAccess) {
+    if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess().then(midi => {
+            console.log(midi.inputs);
             let inputs = midi.inputs.values();
+            console.log(inputs);
             for (let input = inputs.next();
                  input && !input.done;
                  input = inputs.next()) {
                 input.value.onmidimessage = message => {
                     if (message.data[0] == 145) {
-                        engine.noteOn(userName, message.data[1], currentInstrument, message.data[2]/127);
-                        pingServer(userName, message.data[1], "note on", currentInstrument, message.data[2]/127);
+                    	NoteOn(userName, message.data[1], currentInstrument, message.data[2]/127);
                     }
                     else if (message.data[0] == 129) {
-                        engine.noteOff(userName, message.data[1]);
-                        pingServer(userName, message.data[1], "note off");
+                    	NoteOff(userName, message.data[1]);
                     }
                 };
                 midiConnected = true;
