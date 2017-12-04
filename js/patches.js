@@ -149,19 +149,40 @@ function GetPatches() {
 					"filename": "audio/Jazz Open HH.ogg",
 					"startNote": 78,
 					"endNote": 78,
-					"centerNote": 78
+					"centerNote": 78,
+					"envelope": {
+						attackTime: 0,
+						decayTime: 0,
+						sustainLevel: 1,
+						releaseTime: 0.2,
+						curve: "exponential"
+					}
 				},
 				{
 					"filename": "audio/Jazz Half HH.ogg",
 					"startNote": 79,
 					"endNote": 79,
-					"centerNote": 79
+					"centerNote": 79,
+					"envelope": {
+						attackTime: 0,
+						decayTime: 0,
+						sustainLevel: 1,
+						releaseTime: 0.2,
+						curve: "exponential"
+					}
 				},
 				{
 					"filename": "audio/Jazz Pedal HH.ogg",
 					"startNote": 80,
 					"endNote": 80,
-					"centerNote": 80
+					"centerNote": 80,
+					"envelope": {
+						attackTime: 0,
+						decayTime: 0,
+						sustainLevel: 1,
+						releaseTime: 0.2,
+						curve: "exponential"
+					}
 				},
 				{
 					"filename": "audio/Jazz Crash.ogg",

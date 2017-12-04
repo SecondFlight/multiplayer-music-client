@@ -133,13 +133,18 @@ class Engine {
 
 		let uniqueID = userID + midiNumber.toString();
 
-		// I realize that this coding implies that layers can overlap.
+		// I realize that this code implies that layers can overlap.
 		// As it turns out, layers can most decidedly not overlap.
 
 		for (let i in layersToPlay) {
 			let layer = layersToPlay[i];
 			let doesLoop = (layer.loop != undefined) && (layer.loop);
-			this.playSample(layer.filename, midiNumber - layer.centerNote, patch.envelope, uniqueID, velocity, doesLoop);
+			let envelope;
+			if (layer.envelope != undefined)
+				envelope = layer.envelope;
+			else
+				envelope = patch.envelope;
+			this.playSample(layer.filename, midiNumber - layer.centerNote, envelope, uniqueID, velocity, doesLoop);
 		}
 	}
 

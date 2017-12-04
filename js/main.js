@@ -9,11 +9,29 @@ let instruments = engine.getInstruments();
 let currentInstrument = instruments[0];
 let midiConnected = false;
 
+let octave = 0;
+
+let color;
+
 //https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
 var userName = "";
 window.onload = function(){
+	color = new jscolor(document.getElementById("noteColor"));
+	let r = parseInt(Math.random()*255);
+	let g = parseInt(Math.random()*255);
+	let b = parseInt(Math.random()*255);
+	let rand = parseInt(Math.random()*3);
+	if (rand == 0)
+		r = 255;
+	else if (rand == 1)
+		g = 255;
+	else
+		b = 255;
+
+	color.fromRGB(r, g, b);
+
 	var txt;
-	userName = prompt("Please Enter your Username: ", "" );
+	userName = prompt("Please enter your username: ", "" );
 	if (userName == null || userName == "") {
         userName = "Anonymous";
     }
@@ -34,7 +52,7 @@ function AddColor(keyNum, color) {
 
 function RemoveColor(keyNum, previousColor) {
     let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
-    if (rgb2hex(element.style.backgroundColor) == "#" + previousColor.toLowerCase()) {
+    if (rgb2hex(element.style.backgroundColor) == previousColor.toLowerCase()) {
         element.removeAttribute("style");
     }
 }
@@ -42,7 +60,7 @@ function RemoveColor(keyNum, previousColor) {
 // https://jsfiddle.net/Mottie/xcqpF/1/light/
 function rgb2hex(rgb){
  rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
- return (rgb && rgb.length === 4) ? "#" +
+ return (rgb && rgb.length === 4) ?
   ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
   ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
   ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
@@ -54,13 +72,13 @@ function GetColorFromPage() {
 
 function NoteOn(userName, keyNum, currentInstrument, velocity) {
 	engine.noteOn(userName, keyNum, currentInstrument);
-	pingServer(userName, keyNum, 'note on', currentInstrument, velocity);
+	pingServer(socket.id, keyNum, 'note on', currentInstrument, velocity);
 	AddColor(keyNum, GetColorFromPage());
 }
 
 function NoteOff(userName, keyNum) {
 	engine.noteOff(userName, keyNum);
-	pingServer(userName, keyNum, 'note off');
+	pingServer(socket.id, keyNum, 'note off');
 	RemoveColor(keyNum, GetColorFromPage());
 }
 
@@ -92,7 +110,7 @@ function KeyListener(){
             const keyName = event.key;
             const keyNum = keyboardMap[keyName];
 			if (keyNum != undefined) {
-                NoteOn(userName, keyNum, currentInstrument, 1.0);
+                NoteOn(userName, keyNum + 12*octave, currentInstrument, 1.0);
 			}
 			//setTimeout( function() { keyElementColour.removeAttribute("style");}, 500);
 
@@ -111,7 +129,7 @@ function KeyListener(){
         const keyNum = keyboardMap[keyName];
 
         if (keyNum != undefined) {
-            NoteOff(userName, keyNum);
+            NoteOff(userName, keyNum + 12*octave);
         }
         // do things maybe
     }
@@ -181,4 +199,14 @@ document.getElementById("midiButton").addEventListener("click", function(event) 
             }
         });
     }
+});
+
+document.getElementById("octaveUp").addEventListener("click", function(event) {
+	octave += 1;
+	document.getElementById("octaveText").innerHTML = octave;
+});
+
+document.getElementById("octaveDown").addEventListener("click", function(event) {
+	octave -= 1;
+	document.getElementById("octaveText").innerHTML = octave;
 });
