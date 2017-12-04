@@ -2,9 +2,19 @@
 
 class Engine {
 	constructor() {
+		//this.ready = false;
 		console.log("Engine class created.");
 		// Define the instruments
 		this.patches = GetPatches();
+
+		/*let loadedCount = 0;
+		let bufferCount = 0;
+
+		let patches = this.getInstruments();
+
+		for (let i = 0; i < patches.length; i++) {
+			bufferCount += this.patches[patches[i]].layers.length;
+		}*/
 
 		this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 		// Webkit/blink browsers need prefix, Safari won't work without window
@@ -32,7 +42,12 @@ class Engine {
 					let dataBuffer = request.response;
 
 					this.audioCtx.decodeAudioData(dataBuffer, (buffer) => {
-						this.buffers[layer.filename] = buffer;
+						/*this.buffers[layer.filename] = buffer;
+
+						// mark this one as loaded
+						loadedCount += 1;
+						if (loadedCount == bufferCount)
+							this.ready = true;*/
 					});
 				};
 
@@ -40,10 +55,12 @@ class Engine {
 			});
 		}
 
-
+		this.ready = true;
 	}
 
 	noteOn(userID, noteNumber, instrument="Piano", velocity=1.0) {
+		//if (!this.ready)
+		//	return;
 		console.log("Note on called.");
 		console.log("userID:" + userID);
 		console.log("noteNumber" + noteNumber.toString());
@@ -53,6 +70,8 @@ class Engine {
 	}
 
 	noteOff(userID, noteNumber) {
+		//if (!this.ready)
+		//	return;
 		console.log("Note off called.");
 		console.log("userID:" + userID);
 		console.log("noteNumber" + noteNumber.toString());
@@ -75,6 +94,8 @@ class Engine {
 
 		let source = this.audioCtx.createBufferSource();
 		source.buffer = this.buffers[audioFile];
+		if (source.buffer == null || source.buffer == undefined)
+			return;
 		source.detune.value = 100*coarseDetune;
 		source.loop = doesLoop;
 

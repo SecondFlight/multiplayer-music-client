@@ -13,10 +13,17 @@ let octave = 0;
 
 let color;
 
+let users = {};
+
+let userCounts = {};
+
+let loaded = false;
+
 //https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
 var userName = "";
 window.onload = function(){
-	color = new jscolor(document.getElementById("noteColor"));
+	let noteColorElem = document.getElementById("noteColor");
+	color = new jscolor(noteColorElem);
 	let r = parseInt(Math.random()*255);
 	let g = parseInt(Math.random()*255);
 	let b = parseInt(Math.random()*255);
@@ -31,10 +38,20 @@ window.onload = function(){
 	color.fromRGB(r, g, b);
 
 	var txt;
-	userName = prompt("Please enter your username: ", "" );
+	userName = prompt("Please enter your username: ", "");
 	if (userName == null || userName == "") {
         userName = "Anonymous";
     }
+
+    /*socket.emit("update user info", {
+    	username: userName,
+    	color: noteColorElem.value
+    });*/
+    UpdateUserInfo();
+
+    noteColorElem.onchange = () => {
+    	UpdateUserInfo();
+    };
 
     instrumentSelectBox = document.getElementById("instrumentSelect");
     for (let i = 0; i < instruments.length; i++) {
@@ -43,6 +60,8 @@ window.onload = function(){
     instrumentSelectBox.addEventListener("change", event => {
         currentInstrument = event.target.value;
     });
+
+    loaded = true;
 };
 
 function AddColor(keyNum, color) {
@@ -74,12 +93,32 @@ function NoteOn(userName, keyNum, currentInstrument, velocity) {
 	engine.noteOn(userName, keyNum, currentInstrument);
 	pingServer(socket.id, keyNum, 'note on', currentInstrument, velocity);
 	AddColor(keyNum, GetColorFromPage());
+	AddToUserCounts(socket.id, 1);
+	MoveName(socket.id);
 }
 
 function NoteOff(userName, keyNum) {
 	engine.noteOff(userName, keyNum);
 	pingServer(socket.id, keyNum, 'note off');
 	RemoveColor(keyNum, GetColorFromPage());
+	AddToUserCounts(socket.id, -1);
+	MoveName(socket.id);
+}
+
+function AddToUserCounts(key, value) {
+	if (userCounts[key] == undefined) {
+		userCounts[key] = 0;
+	}
+	userCounts[key] += value;
+}
+
+function MoveName(id) {
+	elem = document.getElementById(id);
+	if (userCounts[id] > 0) {
+		elem.classList.add("active");
+	} else {
+		elem.classList.remove("active");
+	}
 }
 
 // modified from https://stackoverflow.com/a/10467137/8166701
@@ -146,11 +185,11 @@ var noteKeys = document.getElementsByClassName("note");
 for (var i = 0; i < noteKeys.length; i++)
 {
 	var element = noteKeys[i];
-	element.addEventListener("click", function(event) {
+	/*element.addEventListener("click", function(event) {
 		NoteOn(userName, parseInt(event.target.dataset.notenumber), currentInstrument, 1.0);
 		event.style.backgroundColor = "red";
 		setTimeout( function() { event.target.removeAttribute("style");}, 500);
-	});
+	});*/
 	
 	/*element.addEventListener("mouseUp", function(event) {
 		engine.noteOn(userName, parseInt(event.target.dataset.notenumber));
@@ -169,13 +208,32 @@ function pingServer(userID, noteNumber, msgType, instrument = "", velocity = 0){
 }
 
 socket.on('note on', function(msg) {
-	engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
-    AddColor(msg.noteNumber, msg.color);
+	if (loaded) {
+		engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
+	    AddColor(msg.noteNumber, msg.color);
+	    AddToUserCounts(msg.userID, 1);
+	}
 });
 
 socket.on('note off', function(msg) {
-    engine.noteOff(msg.userID, msg.noteNumber);
-    RemoveColor(msg.noteNumber, msg.color);
+	if (loaded) {
+	    engine.noteOff(msg.userID, msg.noteNumber);
+	    RemoveColor(msg.noteNumber, msg.color);
+	    AddToUserCounts(msg.userID, -1);
+	}
+});
+
+socket.on('update users', function(msg) {
+	let usersElem = document.getElementById("users");
+	usersElem.innerHTML = "";
+
+	users = msg;
+	for (let id in users) {
+	    if (users.hasOwnProperty(id)) {
+	    	let user = users[id];
+	    	usersElem.innerHTML += '<p id="' + id + '" style="color:' + user.color + ';">' + user.username + '</p>';
+	    }
+	}
 });
 
 document.getElementById("midiButton").addEventListener("click", function(event) {
@@ -210,3 +268,10 @@ document.getElementById("octaveDown").addEventListener("click", function(event) 
 	octave -= 1;
 	document.getElementById("octaveText").innerHTML = octave;
 });
+
+function UpdateUserInfo() {
+	socket.emit("update user info", {
+		username: userName,
+		color: GetColorFromPage()
+	});
+}

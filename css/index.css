@@ -48,6 +48,16 @@ button {
 	margin: 10px;
 }
 
+#users > p {
+	font-weight: bold;
+	transition: margin-left 1s;
+}
+
+#users > p.active {
+	margin-left: 5px;
+	transition: margin-left 0.15s;
+}
+
 /*
 	do something for black key 
 */

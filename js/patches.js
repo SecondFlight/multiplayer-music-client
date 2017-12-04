@@ -88,7 +88,7 @@ function GetPatches() {
 				releaseTime: 0.5,
 				curve: "exponential"
 			}
-		},
+		},/*
 		"Sine Bell": {
 			"layers": [
 				{
@@ -106,7 +106,7 @@ function GetPatches() {
 				releaseTime: 7,
 				curve: "exponential"
 			}
-		},
+		},*/
 		"Drum Kit": {
 			"layers": [
 				{
