@@ -42,10 +42,10 @@ class Engine {
 					let dataBuffer = request.response;
 
 					this.audioCtx.decodeAudioData(dataBuffer, (buffer) => {
-						/*this.buffers[layer.filename] = buffer;
+						this.buffers[layer.filename] = buffer;
 
 						// mark this one as loaded
-						loadedCount += 1;
+						/*loadedCount += 1;
 						if (loadedCount == bufferCount)
 							this.ready = true;*/
 					});
