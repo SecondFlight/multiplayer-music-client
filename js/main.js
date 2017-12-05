@@ -110,14 +110,21 @@ function AddToUserCounts(key, value) {
 		userCounts[key] = 0;
 	}
 	userCounts[key] += value;
+	if (userCounts[key] < 0)
+		userCounts[key] = 0;
 }
 
 function MoveName(id) {
-	elem = document.getElementById(id);
-	if (userCounts[id] > 0) {
-		elem.classList.add("active");
-	} else {
-		elem.classList.remove("active");
+	try {
+		elem = document.getElementById(id);
+		if (userCounts[id] > 0) {
+			elem.classList.add("active");
+		} else {
+			elem.classList.remove("active");
+		}
+	}
+	catch (e) {
+
 	}
 }
 
@@ -126,16 +133,26 @@ function KeyListener(){
     this.keysStatus = Array();
     
     //Constructor
-    $(document).keydown(
+    $("body").keydown(
         function(e){
-            e.preventDefault();
-            KeyListener.onKeyDown(e);
+        	if (!(document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT')) {
+        		e.preventDefault();
+        		KeyListener.onKeyDown(e);
+        	} else {
+        		if (e.which == 13) {
+        			let chatBoxElem = document.getElementById("chatInput");
+        			sendMessage(chatBoxElem.value);
+        			chatBoxElem.value = "";
+        		}
+        	}
         }
     );
-    $(document).keyup(
+    $("body").keyup(
         function(e){
-            e.preventDefault();
-            KeyListener.onKeyUp(e);
+			if (!(document.activeElement.nodeName == 'TEXTAREA' || document.activeElement.nodeName == 'INPUT')) {
+				e.preventDefault();
+				KeyListener.onKeyUp(e);
+        	}
         }
     );
     
@@ -208,19 +225,17 @@ function pingServer(userID, noteNumber, msgType, instrument = "", velocity = 0){
 }
 
 socket.on('note on', function(msg) {
-	if (loaded) {
-		engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
-	    AddColor(msg.noteNumber, msg.color);
-	    AddToUserCounts(msg.userID, 1);
-	}
+	engine.noteOn(msg.userID, msg.noteNumber, msg.instrument, msg.velocity);
+    AddColor(msg.noteNumber, msg.color);
+    AddToUserCounts(msg.userID, 1);
+    MoveName(msg.userID);
 });
 
 socket.on('note off', function(msg) {
-	if (loaded) {
-	    engine.noteOff(msg.userID, msg.noteNumber);
-	    RemoveColor(msg.noteNumber, msg.color);
-	    AddToUserCounts(msg.userID, -1);
-	}
+    engine.noteOff(msg.userID, msg.noteNumber);
+    RemoveColor(msg.noteNumber, msg.color);
+    AddToUserCounts(msg.userID, -1);
+    MoveName(msg.userID);
 });
 
 socket.on('update users', function(msg) {
@@ -235,6 +250,21 @@ socket.on('update users', function(msg) {
 	    }
 	}
 });
+
+socket.on('chat message', function(msg) {
+	let chatElem = document.getElementById("messages");
+	chatElem.innerHTML += '<p class="message"><span style="color:' + msg.color + ';">' + msg.username + ': </span>' + msg.message + '</p>';
+});
+
+function sendMessage(message) {
+	let messageObj = {
+		username: userName,
+		color: GetColorFromPage(),
+		message: message
+	}
+
+	socket.emit('chat message', messageObj);
+}
 
 document.getElementById("midiButton").addEventListener("click", function(event) {
     if (navigator.requestMIDIAccess) {

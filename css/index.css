@@ -48,14 +48,40 @@ button {
 	margin: 10px;
 }
 
+#users {
+	display: inline-block;
+	max-width: 20%
+	width: 20%;
+}
+
 #users > p {
 	font-weight: bold;
 	transition: margin-left 1s;
 }
 
 #users > p.active {
-	margin-left: 5px;
+	margin-left: 10px;
 	transition: margin-left 0.15s;
+}
+
+.messages-container {
+	display: inline-block;
+	left: 30%;
+	width: 30%;
+	position: absolute;
+}
+
+#messages {
+	height: 220px;
+	overflow-y: auto;
+}
+
+.message {
+	font-size: small;
+}
+
+.chatInput {
+	width:100%;
 }
 
 /*
