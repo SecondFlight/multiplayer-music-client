@@ -7,6 +7,7 @@ let engine = new Engine();
 
 let instruments = engine.getInstruments();
 let currentInstrument = instruments[0];
+let currentMIDIDevice = "";
 let midiConnected = false;
 
 let octave = 0;
@@ -16,8 +17,6 @@ let color;
 let users = {};
 
 let userCounts = {};
-
-let loaded = false;
 
 //https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt
 var userName = "";
@@ -61,19 +60,56 @@ window.onload = function(){
         currentInstrument = event.target.value;
     });
 
-    loaded = true;
+	WebMidi.enable(error => {
+
+		let midiSelectBox = document.getElementById("midiSelect");
+
+		midiSelectBox.innerHTML = "";
+
+		midiSelectBox.options[0] = new Option("(select a MIDI device)", "(select a MIDI device)");
+
+		for (let i = 0; i < WebMidi.inputs.length; i++) {
+			midiSelectBox.options[midiSelectBox.options.length] = new Option(WebMidi.inputs[i].name, WebMidi.inputs[i].name);
+		}
+		midiSelectBox.addEventListener("change", event => {
+			for (let i = 0; i < WebMidi.inputs.length; i++) {
+				WebMidi.inputs[i].removeListener('noteon');
+				WebMidi.inputs[i].removeListener('noteoff');
+			}
+			let input = WebMidi.getInputByName(event.target.value);
+			if (input == undefined || input == null)
+				return;
+			input.addListener("noteon", "all", event => {
+				NoteOn(userName, event.data[1], currentInstrument, event.data[2]/127);
+				console.log(event.data[2]/127);
+			});
+			input.addListener("noteoff", "all", event => {
+				NoteOff(userName, event.data[1]);
+			});
+		});
+	});
 };
 
 function AddColor(keyNum, color) {
-    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
-    element.style.backgroundColor = color;
+	try {
+	    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+	    element.style.backgroundColor = color;
+	}
+	catch (e) {
+
+	}
 }
 
 function RemoveColor(keyNum, previousColor) {
-    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
-    if (rgb2hex(element.style.backgroundColor) == previousColor.toLowerCase()) {
-        element.removeAttribute("style");
-    }
+	try {
+	    let element = document.querySelector("[data-notenumber='" + keyNum.toString() + "']");
+	    if (rgb2hex(element.style.backgroundColor) == previousColor.toLowerCase()) {
+	        element.removeAttribute("style");
+	    }
+	}
+	catch (e) {
+
+	}
 }
 
 // https://jsfiddle.net/Mottie/xcqpF/1/light/
@@ -90,7 +126,7 @@ function GetColorFromPage() {
 }
 
 function NoteOn(userName, keyNum, currentInstrument, velocity) {
-	engine.noteOn(userName, keyNum, currentInstrument);
+	engine.noteOn(userName, keyNum, currentInstrument, velocity);
 	pingServer(socket.id, keyNum, 'note on', currentInstrument, velocity);
 	AddColor(keyNum, GetColorFromPage());
 	AddToUserCounts(socket.id, 1);
@@ -268,7 +304,7 @@ function sendMessage(message) {
 	socket.emit('chat message', messageObj);
 }
 
-document.getElementById("midiButton").addEventListener("click", function(event) {
+/*document.getElementById("midiButton").addEventListener("click", function(event) {
     if (navigator.requestMIDIAccess) {
         navigator.requestMIDIAccess().then(midi => {
             console.log(midi.inputs);
@@ -289,7 +325,9 @@ document.getElementById("midiButton").addEventListener("click", function(event) 
             }
         });
     }
-});
+
+});*/
+
 
 document.getElementById("octaveUp").addEventListener("click", function(event) {
 	octave += 1;

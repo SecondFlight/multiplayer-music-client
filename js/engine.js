@@ -61,20 +61,20 @@ class Engine {
 	noteOn(userID, noteNumber, instrument="Piano", velocity=1.0) {
 		//if (!this.ready)
 		//	return;
-		console.log("Note on called.");
+		/*console.log("Note on called.");
 		console.log("userID:" + userID);
 		console.log("noteNumber" + noteNumber.toString());
 		console.log("instrument:" + instrument);
-		console.log("velocity:" + velocity.toString());
+		console.log("velocity:" + velocity.toString());*/
 		this.playNote(userID, instrument, noteNumber, velocity);
 	}
 
 	noteOff(userID, noteNumber) {
 		//if (!this.ready)
 		//	return;
-		console.log("Note off called.");
+		/*console.log("Note off called.");
 		console.log("userID:" + userID);
-		console.log("noteNumber" + noteNumber.toString());
+		console.log("noteNumber" + noteNumber.toString());*/
 		this.releaseNote(userID, noteNumber);
 	}
 

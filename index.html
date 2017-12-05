@@ -5,7 +5,10 @@
 <body>
 	<h1>Hello!</h1>
 	<h3>Use your typing keyboard to play some music :)</h3>
-	<button type="button" id="midiButton">Connect MIDI Device</button>
+	<!--<button type="button" id="midiButton">Connect MIDI Device</button>-->
+	<select id="midiSelect">
+
+	</select>
 	<select id="instrumentSelect">
 
 	</select>
@@ -115,6 +118,7 @@
 	</div>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/webmidi@2.0.0-rc.11/webmidi.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
 	<script src="http://music.atoms.one:3000/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="js/envelope-generator.js"></script>
