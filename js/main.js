@@ -253,7 +253,9 @@ socket.on('update users', function(msg) {
 
 socket.on('chat message', function(msg) {
 	let chatElem = document.getElementById("messages");
+	let scrollToBottom = false;
 	chatElem.innerHTML += '<p class="message"><span style="color:' + msg.color + ';">' + msg.username + ': </span>' + msg.message + '</p>';
+	chatElem.scrollTop = chatElem.scrollHeight;
 });
 
 function sendMessage(message) {
