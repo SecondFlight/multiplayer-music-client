@@ -233,6 +233,70 @@ function GetPatches() {
 				sustainLevel: 1,
 				releaseTime: 7
 			}
+		},
+		"Celeste": {
+			"layers": [
+				{
+					"filename": "audio/CelesteC4.ogg",
+					"startNote": 0,
+					"endNote": 63,
+					"centerNote": 60
+				},
+				{
+					"filename": "audio/CelesteG4.ogg",
+					"startNote": 64,
+					"endNote": 69,
+					"centerNote": 67
+				},
+				{
+					"filename": "audio/CelesteC5.ogg",
+					"startNote": 70,
+					"endNote": 75,
+					"centerNote": 72
+				},
+				{
+					"filename": "audio/CelesteG5.ogg",
+					"startNote": 76,
+					"endNote": 81,
+					"centerNote": 79
+				},
+				{
+					"filename": "audio/CelesteC6.ogg",
+					"startNote": 82,
+					"endNote": 87,
+					"centerNote": 84
+				},
+				{
+					"filename": "audio/CelesteG6.ogg",
+					"startNote": 88,
+					"endNote": 93,
+					"centerNote": 91
+				},
+				{
+					"filename": "audio/CelesteC7.ogg",
+					"startNote": 94,
+					"endNote": 99,
+					"centerNote": 96
+				},
+				{
+					"filename": "audio/CelesteG7.ogg",
+					"startNote": 100,
+					"endNote": 105,
+					"centerNote": 103
+				},
+				{
+					"filename": "audio/CelesteC8.ogg",
+					"startNote": 106,
+					"endNote": 127,
+					"centerNote": 108
+				}
+			],
+			"envelope": {
+				attackTime: 0,
+				decayTime: 0,
+				sustainLevel: 1,
+				releaseTime: 7
+			}
 		}
 	}
 }

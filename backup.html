@@ -1,0 +1,131 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<h1>Hello!</h1>
+	<h3>Use your typing keyboard to play some music :)</h3>
+	<!--<button type="button" id="midiButton">Connect MIDI Device</button>-->
+	<select id="midiSelect">
+
+	</select>
+	<select id="instrumentSelect">
+
+	</select>
+	<input class="jscolor" id="noteColor">
+	<div class="octave">
+		<button type="button" id="octaveDown">-</button>
+		<span id="octaveText">0</span>
+		<button type="button" id="octaveUp">+</button>
+	</div>
+	<div class="keyboard">
+		<div class="whiteKeys">
+			<div class="whiteKey note" data-noteNumber = "38"></div>
+			<div class="whiteKey note" data-noteNumber = "40"></div>
+			<div class="whiteKey note" data-noteNumber = "41"></div>
+			<div class="whiteKey note" data-noteNumber = "43"></div>
+			<div class="whiteKey note" data-noteNumber = "45"></div>
+			<div class="whiteKey note" data-noteNumber = "47"></div>
+			<div class="whiteKey note" data-noteNumber = "48"></div>
+			<div class="whiteKey note" data-noteNumber = "50"></div>
+			<div class="whiteKey note" data-noteNumber = "52"></div>
+			<div class="whiteKey note" data-noteNumber = "53"></div>
+			<div class="whiteKey note" data-noteNumber = "55"></div>
+			<div class="whiteKey note" data-noteNumber = "57"></div>
+			<div class="whiteKey note" data-noteNumber = "59"></div>
+			<div class="whiteKey note" data-noteNumber = "60"></div>
+			<div class="whiteKey note" data-noteNumber = "62"></div>
+			<div class="whiteKey note" data-noteNumber = "64"></div>
+			<div class="whiteKey note" data-noteNumber = "65"></div>
+			<div class="whiteKey note" data-noteNumber = "67"></div>
+			<div class="whiteKey note" data-noteNumber = "69"></div>
+			<div class="whiteKey note" data-noteNumber = "71"></div>
+			<div class="whiteKey note" data-noteNumber = "72"></div>
+			<div class="whiteKey note" data-noteNumber = "74"></div>
+			<div class="whiteKey note" data-noteNumber = "76"></div>
+			<div class="whiteKey note" data-noteNumber = "77"></div>
+			<div class="whiteKey note" data-noteNumber = "79"></div>
+			<div class="whiteKey note" data-noteNumber = "81"></div>
+			<div class="whiteKey note" data-noteNumber = "83"></div>
+			<div class="whiteKey note" data-noteNumber = "84"></div>
+			<div class="whiteKey note" data-noteNumber = "86"></div>
+			<div class="whiteKey note" data-noteNumber = "88"></div>
+			<div class="whiteKey note" data-noteNumber = "89"></div>
+			<div class="whiteKey note" data-noteNumber = "91"></div>
+			<div class="whiteKey note" data-noteNumber = "93"></div>
+			<div class="whiteKey note" data-noteNumber = "95"></div>
+			<div class="whiteKey note" data-noteNumber = "96"></div>
+			<div class="whiteKey note" data-noteNumber = "98"></div>
+			<div class="whiteKey note" data-noteNumber = "100"></div>
+			<div class="whiteKey note" data-noteNumber = "101"></div>
+			<div class="whiteKey note" data-noteNumber = "103"></div>
+			<div class="whiteKey note" data-noteNumber = "105"></div>
+			<div class="whiteKey note" data-noteNumber = "107"></div>
+			<div class="whiteKey note" data-noteNumber = "108"></div>
+		</div>
+		<div class="blackKeys">
+			<div class="blackKey note" data-noteNumber = "39"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "42"></div>
+			<div class="blackKey note" data-noteNumber = "44"></div>
+			<div class="blackKey note" data-noteNumber = "46"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "49"></div>
+			<div class="blackKey note" data-noteNumber = "51"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "54"></div>
+			<div class="blackKey note" data-noteNumber = "56"></div>
+			<div class="blackKey note" data-noteNumber = "58"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "61"></div>
+			<div class="blackKey note" data-noteNumber = "63"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "66"></div>
+			<div class="blackKey note" data-noteNumber = "68"></div>
+			<div class="blackKey note" data-noteNumber = "70"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "73"></div>
+			<div class="blackKey note" data-noteNumber = "75"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "78"></div>
+			<div class="blackKey note" data-noteNumber = "80"></div>
+			<div class="blackKey note" data-noteNumber = "82"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "85"></div>
+			<div class="blackKey note" data-noteNumber = "87"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "90"></div>
+			<div class="blackKey note" data-noteNumber = "92"></div>
+			<div class="blackKey note" data-noteNumber = "94"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "97"></div>
+			<div class="blackKey note" data-noteNumber = "99"></div>
+			<div class="blackKey hidden"></div>
+			<div class="blackKey note" data-noteNumber = "102"></div>
+			<div class="blackKey note" data-noteNumber = "104"></div>
+			<div class="blackKey note" data-noteNumber = "106"></div>
+			<div class="blackKey hidden"></div>
+		</div>
+	</div>
+	
+	<div id="users">
+	</div>
+
+	<div class="messages-container">
+		<div id="messages">
+		</div>
+		<input class="chatInput" id="chatInput" type="text">
+	</div>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/webmidi@2.0.0-rc.11/webmidi.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
+	<script src="http://music.atoms.one:3000/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="js/envelope-generator.js"></script>
+	<script type="text/javascript" src="js/patches.js"></script>
+	<script type="text/javascript" src="js/engine.js"></script>
+	<script type="text/javascript" src="js/mainBackup.js"></script>
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans" />
+	<link rel="stylesheet" href="css/index.css">
+</body>
+</html>
